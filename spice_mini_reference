@@ -1,0 +1,202 @@
+1.Simple Netlist Components
+
+1.1. Resistor Component- 
+RXXXXXXXXXX N1 N2 <value> <mname> <L=length> <W=width> <TEMP=t>
+
+N1-first terminal
+N2-second terminal 
+value-resistance in ohms 
+mname-name of the model to be used 
+
+1.2. Capacitor Component 
+CXXXXXXXXXX N+ N- value <IC=incond>
+
+N+ positive terminal 
+N- negative terminal 
+value - capcitance in farads 
+incond - initial voltage in a simulation 
+
+1.3. Inductor Component 
+LYYYYYYYYYY N+ N- value <IC=incond>
+
+N+ positive terminal 
+N- negative terminal 
+value - capcitance in farads 
+incond - initial voltage in a simulation 
+
+1.4. Junction Diode Component 
+
+DXXXXXXXXXX N+ N- mname area off <IC=Vd> <TEMP=t>
+
+N+ positive terminal 
+N- negative terminal 
+mname - name of the model to be used 
+area - scaling factor of the diode(determines how much current can flow through the diode)
+off - optional starting condition in DC analysis
+Vd - starting voltage in a simulation 
+t - temperature of the diode in Kelvin 
+
+1.5. Bipolar Junction Transistor Component 
+
+QXXXXXXXXXX NC NB NE <NS> mname area off <IC=Vbe, Vce> <TEMP=T>
+
+NC - collector terminal 
+NB - base terminal 
+NE - emitter terminal
+NS - substrate terminal(optional)
+mname - name of the model to be used 
+area - scaling factor of the BJT ( determines how much current can flow through it)
+off - optional starting condition in DC analysis
+Vbe, Vce  - starting voltage in a simulation 
+t - temperature of the diode in Kelvin 
+
+1.6. MOSFET Component 
+
+MXXXXXXXX ND NG NS NB mname <L=val> <W=val> <AD=val> <AS=val> <PD=val> <PS=val> <NRD=val> <NRS=val> <OFF> <IC= Vds, Vgs, Vbs> <TEMP=t>
+
+ND - drain terminal 
+NG - gate terminal 
+NS - source terminal 
+NB - bulk terminal 
+mname - name of the model to be used 
+L - length of the gate 
+W - width of the gate 
+AD - area of drain contact in square meters
+AS - area of source contact in square meters 
+PD - perimeter of the drain contact 
+PS - perimeter of the source contact 
+NRD - equivalent squares that make up the drain to determine drain resistance 
+NRS - equivalent squares that make up the drain to determine source resistance 
+OFF - optional starting condition for DC analysis
+Vds, Vgs, Vbs - intial voltage in a simulation 
+t - temperature of the diode in Kelvin 
+
+1.7. Voltage Source Component 
+VXXXXXXXXX N+ N- <<DC> DC/TRAN value> <ACMAG <ACPHASE>>
+
+N+ positive terminal
+N- negative terminal 
+<DC> DC/TRAN value - the DC offset of the voltage source 
+<AC> ACMAG <ACPHASE> - the AC magnitude and phase applied in AC analysis 
+
+1.8. Current Source Component 
+IXXXXXXXX N+ N- <<DC> DC/TRAN value> <ACMAG <ACPHASE>>
+
+N+ positive terminal
+N- negative terminal 
+<DC> DC/TRAN value - the DC offset of the current source 
+<AC> ACMAG <ACPHASE> - the AC magnitude and phase applied in AC analysis 
+
+2. Current and Voltage Source DC Functions 
+
+2.1. Pulse Function
+PULSE (V1 V2 <TD> <TR> <TF> <PW> <PER>)
+
+V1 - initial value(volts/amps)
+V2 - pulse value (volts/amps)
+TD - seconds before the first pulse 
+TR - Rise time in seconds 
+TF - Fall time in seconds 
+PW - Pulse width
+PER - time between each rising edge of the pulse after the first initial pulse 
+
+2.2. Sinusoidal Function 
+SIN(V0 Va FREQ <TD> <THETA>)
+
+V0 - the offset value(volts/amps)
+Va - peak amplitude(volts/amps)
+FREQ - frequency in Hertz
+TD - initial delay 
+THETA - damping factor of the sinusoid in 1/second 
+
+2.3. Exponential Function 
+EXP(V1 V2 <TD1> <TAU1> <TD2> <TAU2>)
+
+V1 - initial value 
+V2 - pulsed value 
+TD1 - seconds before the pulsed value 
+TAU1 - rise time constant for pulse to rise from V1 to V2 
+TD2 - seconds before falling of the pulsed value 
+TAU2 - the fall time constant from V2 to V1 
+
+2.4. Piecewise Linear Function 
+PWL(T1 V1 T2 V2 ......)
+
+Tn - the time where the nth voltage is the desired voltage 
+Vn - the nth voltage 
+
+3. Model Definition Commands 
+
+3.1. Generic Model Command 
+.MODEL MNAME TYPE(PNAME=PVAL1 PNAME2=PVAL2 ......)
+
+MNAME - name of the model 
+TYPE - the type of model(D, NPN, PNP, NMOS)
+PNAMEn - the name of the parameter to be set 
+PVALn - the parameter's value 
+
+4. Basic Simulation Commands 
+
+4.1. Set Iniital Conditions .IC
+.ic V(NODNUM)=VAL V(NODNUM)=VAL .....
+
+NODNUM - name of the node to be set 
+VAL - value of the voltage to set it at 
+
+4.2. Operating Point Analysis .OP
+.op 
+
+Finds the steady state operating conditions of devices and nodes. 
+
+4.3. Small Signal gain analysis .TF 
+
+.tf OUTVAR INSRC 
+
+OUTVAR - output variable (V(NODE1, NODE2) or I(LOAD))
+INSRC - the voltage or current source at the input (Vin Iin)
+
+4.4. Steady State DC analysis .DC 
+.dc SRCNAME VSTART VSTOP VINCR [SRC2 START2 STOP2 INCR2]
+
+SRCNAME - name of the voltage or the input current to vary 
+VSTART - the initial voltage of the input source 
+VSTOP - the final voltage of the input source 
+VINCR - step size
+SRC2 - second source to vary 
+
+4.5. Small Signal AC analysis .AC 
+.ac STYPE ND FSTART FSTOP 
+
+STYPE - a DECade, OCTave, LINear step
+ND - name of the oscillating input current or voltage source 
+FSTART - initial frequency of the input source 
+FSTOP - the final frequency of the input source 
+
+4.6. Transient Analysis .TRAN 
+.tran TSTEP TSTOP <TSTART <TMAX>>
+
+TSTEP - time between each sample in the simulation 
+TSTOP - the stop time in the simulation which starts at 0 seconds 
+TSTART - the start time to save data for later analysis (limited memory situation)
+
+4.7. End of Simulation .END
+.end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
