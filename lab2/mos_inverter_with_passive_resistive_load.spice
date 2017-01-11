@@ -1,0 +1,14 @@
+MOS Inverter with passive resistive load
+
+M1 v_out v_in 0 0 NMOS L=1u W=1u
+RL v_out v_dd 50k
+
+V_dd v_dd 0 5
+V_in v_in 0 dc 5 pulse 0 5 10n 10n 100n 1u 2u 
+
+.dc V_in 0 5 0.01
+.tran 10n 10000n 
+
+.end 
+
+
