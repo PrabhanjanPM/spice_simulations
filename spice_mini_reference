@@ -179,7 +179,14 @@ TSTEP - time between each sample in the simulation
 TSTOP - the stop time in the simulation which starts at 0 seconds 
 TSTART - the start time to save data for later analysis (limited memory situation)
 
-4.7. End of Simulation .END
+4.7. Measurements- .MEASURE
+ 
+.measure {DC|AC|TRAN|SP} result {TRIG} trigger_variable VAL=val {rise=#|rise=LAST} {fall=#|fall=LAST}
+{TARG} target_variable VAL=val  {rise=#|rise=LAST} {fall=#|fall=LAST}
+
+.mesure {DC|AC|TRAN|SP} result AVG out_variable {FROM=val} {TO=val}
+
+4.8. End of Simulation .END
 .end
 
 
