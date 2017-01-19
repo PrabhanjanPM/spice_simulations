@@ -1,0 +1,46 @@
+NMOS inverter Resistive load: Variations subject to changes in load capacitance 
+
+.include ../t14y_tsmc_025_level3.txt
+
+
+v_dd vdd 0 3.3
+v_in vin 0 dc 3.3 pulse (0 3.3 100n 10n 10n 1u 2u)
+
+M1 v_o vin 0 0 cmosn L=1u W=1u
+R_pullup v_o vdd 50k
+C_load v_o 0 1p
+
+.tran 0.1n 10000n
+
+.csparam mid = 3.3/2
+.csparam low = 3.3/10
+.csparam high = 3.3*0.9
+.control 
+
+foreach capacitance 0.01p 0.1p 1p 2p
+
+alter C_load = $capacitance
+run 
+
+*SYNTAX- measure {DC|AC|TRAN|SP} result {TRIG} trigger_variable VAL=val {rise=#|rise=LAST} {fall=#|fall=LAST}
+*	{TARG} target_variable VAL=val  {rise=#|rise=LAST} {fall=#|fall=LAST}
+
+meas tran tplh  trig vin  val=mid fall=1  targ v_o  val=mid rise=1 
+meas tran tphl trig vin val=mid rise=1 targ v_o val=mid fall=1
+meas tran risetime trig v_o val=low rise=1 targ v_o val=high rise=1
+meas tran falltime trig v_o val=high fall=1 targ v_o val=low fall=1
+
+*SYNTAX - mesure {DC|AC|TRAN|SP} result AVG out_variable {FROM=val} {TO=val}
+meas tran i_d_average AVG v_dd#branch from=100n to=2.1u
+
+let power = -3.3*i_d_average
+let propdelay = (tplh+tphl)/2
+print propdelay
+print power 
+
+end
+
+plot tran1.vin tran1.v_o tran2.v_o tran3.v_o tran4.v_o 
+.endc
+
+.end 
