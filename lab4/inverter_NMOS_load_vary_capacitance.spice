@@ -1,0 +1,46 @@
+Inverter with active NMOS load
+
+.include ../t14y_tsmc_025_level3.txt 
+vdd v_dd 0 5 
+vin v_in 0 dc 5 pulse(0 5 100n 10n 10n 1u 2u)
+
+Mdriver v_o v_in 0 0 cmosn L=1u W=1u
+Mload v_dd v_dd v_o 0 cmosn L=1u W=1u
+C_load v_o 0 1p
+
+.tran 0.1n 10000n
+.csparam mid  = 2.5
+.csparam low  = .5
+.csparam high = 4.5
+
+.control
+
+foreach capacitance 0.01p 0.05p 1p 10p 
+alter C_load = $capacitance
+run
+meas tran max_time MAX_AT v_o from=1000n to=2000n
+meas tran min_time MIN_AT v_o from=1000n to=2000n
+let start = max_time-20n
+meas tran v_h MAX v_o from=start to=2000n
+let start = min_time-20n
+meas tran v_l MIN v_o from=start to=2000n
+let range = (v_h-v_l)
+let high = 0.9*range + v_l
+let low = 0.1*range + v_l
+let mid = 0.5*range + v_l
+meas tran risetime trig v_o val=low rise=2 targ v_o val=high rise=2 
+meas tran falltime trig v_o val=high fall=2 targ v_o val=low fall=2 
+meas tran tplh trig v_in val=2.5 fall=2 targ v_o val=mid rise=2
+meas tran tphl trig v_in val=2.5 rise=2 targ v_o val=mid fall=2
+*fix static and dynamic power consumed 
+meas tran avg_dynamic_current AVG vdd#branch from = 1u to = 1.001u
+let dynamic_power = 5*avg_dynamic_current
+let propagation_delay = (tphl+tplh)/2
+print propagation_delay
+print dynamic_power
+end
+
+plot tran1.v_o tran2.v_o tran3.v_o v_in
+.endc
+
+.end

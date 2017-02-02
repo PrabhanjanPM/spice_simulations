@@ -1,0 +1,47 @@
+Optimize an inverter for speed - change NMOS width 
+
+.model nmos_intr nmos level=1 kp=50u vto=0.5 lambda=0.1 gamma=0.6 phi=0.8 tox=150n cgdo=0 cgso=0
+vb vb 0 2.5
+Rs vs vg 50k
+Ro vb vo 300k
+Co vo 0 0.001p
+
+*drain gate source bulk 
+mn1 vo vg 0 0 nmos_intr w=40u l=20u
+
+vs vs 0 dc 0 pulse (0 2.5 10n 1n 1n 50n 200n)
+.tran 0 200n 0 0.1n
+.options method=gear reltol=0.1m
+
+.csparam mid = 2.5/2
+
+.control 
+	setplot SMITA 
+	let propdelay = unitvec(100)
+	let sizes = unitvec(100)
+	let nmoswidth = 40u
+	let ix = 0
+	setscale sizes
+
+	while ix<100
+		run 
+		meas tran tphl trig vs val=mid rise=1 targ vo val=mid fall=1
+		meas tran tplh trig vs val=mid rise=1 targ vo val=mid fall=1
+		let propdelay[ix] = (tphl+tplh)/2
+		let sizes[ix] = nmoswidth
+		let nmoswidth = nmoswidth+2u
+		alter mn1 w = nmoswidth
+		let ix = ix+1
+	end
+
+	let ix=0 
+	while ix < 100
+		print sizes[ix] propdelay[ix]
+		let ix = ix+1
+	end
+
+.endc
+
+.end
+
+
