@@ -18,6 +18,8 @@ C_load v_o 0 1p
 foreach capacitance 0.01p 0.05p 1p 10p 
 alter C_load = $capacitance
 run
+let load_capacitance = $capacitance
+print load_capacitance
 meas tran max_time MAX_AT v_o from=1000n to=2000n
 meas tran min_time MIN_AT v_o from=1000n to=2000n
 let start = max_time-20n
@@ -33,8 +35,10 @@ meas tran falltime trig v_o val=high fall=2 targ v_o val=low fall=2
 meas tran tplh trig v_in val=2.5 fall=2 targ v_o val=mid rise=2
 meas tran tphl trig v_in val=2.5 rise=2 targ v_o val=mid fall=2
 *fix static and dynamic power consumed 
-meas tran avg_dynamic_current AVG vdd#branch from = 1u to = 1.001u
-let dynamic_power = 5*avg_dynamic_current
+meas tran avg_dynamic_current AVG vdd#branch from = 1.11u to = 1.13u
+let dynamic_power = -5*avg_dynamic_current
+meas tran avg_continuous_current AVG vdd#branch from = 1.11u to =2.13u
+let dynamic_power = -5*avg_continuous_current
 let propagation_delay = (tphl+tplh)/2
 print propagation_delay
 print dynamic_power

@@ -14,9 +14,11 @@ C_load v_o 0 1p
 .csparam high = 4.5
 .control
 
-foreach time 1p 0.1n 1n 100n  
+foreach time 0.1p 0.01n 1n 100n  
 alter vin pulse =(0 5 100n $time $time 1u 2u)
 run
+let input_time = $time 
+print input_time
 meas tran max_time MAX_AT v_o from=1000n to=2000n
 meas tran min_time MIN_AT v_o from=1000n to=2000n
 let start = max_time-$time
@@ -32,11 +34,14 @@ meas tran falltime trig v_o val=high fall=2 targ v_o val=low fall=2
 meas tran tplh trig v_in val=2.5 fall=2 targ v_o val=mid rise=2
 meas tran tphl trig v_in val=2.5 rise=2 targ v_o val=mid fall=2
 *fix static and dynamic power consumed 
-meas tran avg_dynamic_current AVG vdd#branch from = 1u to = 1.001u
+meas tran avg_dynamic_current AVG vdd#branch from = 0.999u to = 1.001u
+meas tran avg_continuous_current AVG vdd#branch from = 0.999u to = 2.001u
 let dynamic_power = -5*avg_dynamic_current
+let continuous_power = -5*avg_continuous_current
 let propagation_delay = (tphl+tplh)/2
 print propagation_delay
 print dynamic_power
+print continuous_power
 end
 
 plot tran1.v_in tran2.v_in tran3.v_in tran4.v_in
