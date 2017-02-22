@@ -41,6 +41,6 @@ print avg_power
 let propagation_delay = (tplh+tphl)/2
 print propagation_delay
 end
-plot tran1.v_in tran1.v_o tran2.v_o tran3.v_o 
+plot tran1.v_in tran1.v_o tran2.v_o tran3.v_o tran4.v_o
 .endc
 .end
