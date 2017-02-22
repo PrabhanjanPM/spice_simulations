@@ -1,0 +1,45 @@
+CMOS Inverter 
+
+.include ../t14y_tsmc_025_level3.txt
+
+vdd v_dd 0 5
+vin v_in 0 dc 5 pulse(0 5 10n 1n 1n 1u 2u)
+
+Mpulldown v_o v_in 0 0 cmosn L=1u W=1u
+Mpullup v_o v_in v_dd v_dd cmosp L=1u W=2u 
+Cload v_o 0 1p
+
+.tran 0.1n 10000n
+
+.control 
+
+
+foreach capacitance  10f 1p 10p 100p
+alter Cload = $capacitance
+run
+meas tran v_oh MAX v_o from=3900n to=4100n 
+meas tran v_ol MIN v_o from=2900n to=3100n
+let v_h = 0.9*(v_oh-v_ol) + v_ol
+print v_h
+let v_l = 0.1*(v_oh-v_ol) + v_ol
+print v_l
+let mid = (v_oh+v_ol)/2
+meas tran risetime trig v_o val=v_l rise=2 targ v_o val=v_h rise=2
+meas tran falltime trig v_o val=v_h fall=2 targ v_o val=v_l fall=2
+meas tran tphl trig v_in val=2.5 rise=2 targ v_o val=mid fall=2
+meas tran tplh trig v_in val=2.5 fall=2 targ v_o val=mid rise=2
+meas tran max_current MIN vdd#branch from=1900n to=4100n
+let max_dynamic_power = -max_current*5
+print max_dynamic_power
+meas tran avg_dynamic_current_rise AVG vdd#branch from=900n to=1100n
+meas tran avg_dynamic_current_fall AVG vdd#branch from=1900n to=2100n
+let avg_dynamic_current = -(avg_dynamic_current_rise + avg_dynamic_current_fall)/2
+print avg_dynamic_current
+let avg_power = 5*avg_dynamic_current
+print avg_power 
+let propagation_delay = (tplh+tphl)/2
+print propagation_delay
+end
+plot tran1.v_in tran1.v_o tran2.v_o tran3.v_o 
+.endc
+.end
